@@ -24,7 +24,10 @@ module.exports = (grunt) ->
   below for more options.  For this to work, you may need to install new
   dependencies, e.g. `npm install grunt-contrib-sass`
   ###
-  cssFilesToInject = ["linker/**/*.css"]
+  cssFilesToInject = [
+    "lib/**/*.css"
+    "linker/**/*.css"
+  ]
 
   ###
   Javascript files to inject in order
@@ -34,6 +37,10 @@ module.exports = (grunt) ->
   `sails-linker:devJs` task below for more options.
   ###
   jsFilesToInject = [
+    "lib/jquery.js"
+    "lib/**/*.js"
+    "lib/**/*.coffee"
+
     # Bring in the socket.io client
     # then beef it up with some convenience logic for talking to Sails.js
     "linker/js/socket.io.js"
@@ -41,7 +48,6 @@ module.exports = (grunt) ->
 
     # A simpler boilerplate library for getting you up and running w/ an
     # automatic listener for incoming messages from Socket.io.
-    "linker/js/app.js"
     "linker/**/*.js"
     "linker/**/*.coffee"
   ]
@@ -58,6 +64,37 @@ module.exports = (grunt) ->
   templateFilesToInject = [
     "linker/**/*.jade"
   ]
+
+  @clean =
+    dev: [
+      ".tmp/public/**"
+      "!.tmp/public/**"
+      "!.tmp/public/bower_components/**"
+    ]
+    build: ["www"]
+
+  @bower =
+    install:
+      options:
+        targetDir: 'assets/lib'
+        install: true
+        verbose: true
+        cleanTargetDir: true
+        cleanBowerDir: false
+        bowerOptions: {}
+        layout: -> ""
+
+  @hogan =
+    dev:
+      options:
+        prettify: false
+        defaultName: (file)->
+          file.toUpperCase()
+      files:
+        ".tmp/public/hogan.js": templateFilesToInject
+
+  grunt.loadNpmTasks('grunt-bower-task');
+
 
   #///////////////////////////////////////////////////////////////
   #///////////////////////////////////////////////////////////////
@@ -114,6 +151,10 @@ module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
+    clean: @clean
+    bower: @bower
+    hogan: @hogan
+
     pkg: grunt.file.readJSON("package.json")
     copy:
       dev:
@@ -131,23 +172,6 @@ module.exports = (grunt) ->
           src: ["**/*"]
           dest: "www"
         ]
-
-    clean:
-      dev: [
-        ".tmp/public/**"
-        "!.tmp/public/**"
-        "!.tmp/public/bower_components/**"
-      ]
-      build: ["www"]
-
-    hogan:
-      dev:
-        options:
-          prettify: false
-          defaultName: (file)->
-            file.toUpperCase()
-        files:
-          ".tmp/public/hogan.js": templateFilesToInject
 
     jst:
       dev:

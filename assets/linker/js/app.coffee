@@ -23,14 +23,18 @@
   # Simple log function to keep the example simple
 
   log = ->
-    console.log.apply console, arguments_  if console
+    console.log.apply console, arguments  if console
   socket = io.connect()
   log "Connecting to Sails.js..."  if console
   socket.on "connect", socketConnected = ->
     socket.on "message", messageReceived = (message) ->
       log "New comet message received :: ", message
 
-    log "Socket is now connected and globally accessible as `socket`.\n" + "e.g. to send a GET request to Sails, try \n" + "`socket.get(\"/\", function (response) " + "{ console.log(response); })`"
+    log """
+      Socket is now connected and globally accessible as `socket`.
+      e.g. to send a GET request to Sails, try
+      `socket.get("/", function (response) " + "{ console.log(response); })`
+    """
 
   window.socket = socket
 
