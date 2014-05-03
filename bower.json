@@ -1,0 +1,21 @@
+{
+  "name": "nas-explorer-sails",
+  "version": "0.0.0",
+  "homepage": "https://github.com/7korobi/nas-explorer-sails",
+  "authors": [
+    "7korobi <7korobi@gmail.com>"
+  ],
+  "main": "assets/linker/js/bower.js",
+  "directory": "assets/linker/bower_components",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
