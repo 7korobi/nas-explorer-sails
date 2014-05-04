@@ -34,75 +34,17 @@ block navbar
 
 block body
   .jumbotron
-    h1 Hello World!
-    img.logo(src="http://sailsjs.org/images/sails-logo.jpg")
-
-  ul.nav.navbar-nav#tag-list
-
-  #audio-box
-  ul#audio-list
-
-  #video-box
-  ul#video-list
+    ul.nav.navbar-nav#tag-list
+    hr(style="clear: both;")
 
   .row
-    .col-md-4
-      h4#new New to Sails?
-      ul
-        li
-          a(href="http://sailsjs.org") Visit sailsjs.org
-        li
-          a(href="http://sailsjs.org/#!documentation") Documentation
-      h4 Next Steps
-      ul
-        li.sprite.single_page
-          a(target="_blank", href="http://sailsjs.org") Build a single page app
-        li.sprite.traditional
-          a(target="_blank", href="http://sailsjs.org") Build a traditional webapp
-        li.sprite.realtime
-          a(target="_blank", href="http://sailsjs.org") Build a realtime app
-        li.sprite.api
-          a(target="_blank", href="http://sailsjs.org") Build an API
-    .col-md-8
-      h1#main-title Welcome
-        h2 Getting started
-        p Don't worry, we've got your back.
-
-          ul.getting-started
-            li
-              .sprite.one
-              div
-                h3 Get your API going.
-                p
-                  | Run
-                  code sails generate foo
-                  | .  This will create a model
-                  code Foo
-                  |  and controller
-                  code FooController
-            li
-              .sprite.two
-              div
-                h3 Lift your app.
-                p
-                  | Run
-                  code sails lift
-                  |  to start up your app.  If you visit
-                  code http://localhost:1337/foo
-                  |  in your browser, you'll see a socket.io-compatible REST API was generated for your 'Foo' model.
-            li
-              .sprite.three
-              div
-                h3 Dive in and start building.
-                p From here, you can modify your models, create custom controller methods as Express middleware, and create custom routes (routes are set up in
-                  code config/routes.js
-                  | ).  Visit
-                  a(href="http://sailsjs.org") the Sails website
-                  |  for more information on next steps.
-
-        .delete
-          .sprite You're looking at:
-            code views/home/index.jade
+    #audio-box
+  .row
+    .col-xs-2
+    .col-xs-5
+      ul#audio-list
+    .col-xs-5
+      ul#video-list
 
   footer
 
