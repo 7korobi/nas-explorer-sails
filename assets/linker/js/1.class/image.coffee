@@ -12,7 +12,6 @@ class ImageViewer extends D3Box
       height: -> window.innerHeight
 
     @list.on "click", (d, idx)=>
-      console.log [d, idx, @]
       switch idx
         when 0
           @succ()

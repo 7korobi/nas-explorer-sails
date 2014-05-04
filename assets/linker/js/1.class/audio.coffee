@@ -30,4 +30,4 @@ class AudioPlayer extends D3Box
       @current.load()
       @current.play()
     else
-      @next(limit - 1)
+      @succ(limit - 1)
