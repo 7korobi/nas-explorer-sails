@@ -1,51 +1,58 @@
 extends ../layout
 
-block body
-  .top-bar
-    .container.clearfix
-      img.logo(src="http://sailsjs.org/images/sails-logo.jpg")
+block navbar
+  .navbar-header
+    button.navbar-toggle(type="button" data-toggle="collapse" data-target=".navbar-collapse")
+      span.sr-only Toggle navigation
+      span.icon-bar
+      span.icon-bar
+      span.icon-bar
+    a.navbar-brand(href="#") Project name
 
-  .container.clearfix
-    .main
-      h1#main-title Welcome
-      h2 Getting started
-      p Don't worry, we've got your back.
-      .steps
-        ul.getting-started
+  .navbar-collapse.collapse
+    ul.nav.navbar-nav
+      li.active
+        a(href="/") aaa
+      li
+        a(href="/") bbb
+      li.divider
+      li.dropdown
+        a.dropdown-toggle(data-toggle="dropdown" href="#")
+          | drop-down
+          b.caret
+        ul.dropdown-menu
           li
-            .sprite.one
-            div
-              h3 Get your API going.
-              p
-                | Run
-                span.boxy sails generate foo
-                | .  This will create a model
-                span.boxy Foo
-                |  and controller
-                span.boxy FooController
+            a(href="/") ccc
           li
-            .sprite.two
-            div
-              h3 Lift your app.
-              p
-                | Run
-                span.boxy sails lift
-                |  to start up your app.  If you visit
-                span.boxy http://localhost:1337/foo
-                |  in your browser, you'll see a socket.io-compatible REST API was generated for your 'Foo' model.
+            a(href="/") ddd
+          li.divider
+          li.dropdown-header
           li
-            .sprite.three
-            div
-              h3 Dive in and start building.
-              p From here, you can modify your models, create custom controller methods as Express middleware, and create custom routes (routes are set up in
-                span.boxy config/routes.js
-                | ).  Visit
-                a(href="http://sailsjs.org") the Sails website
-                |  for more information on next steps.
-      .delete
-        .sprite You're looking at:
-          span.boxy views/home/index.jade
-    .side-bar
+            a(href="/") eee
+
+block body
+  hr
+  hr
+  .jumbotron
+    h1 Hello World!
+    img.logo(src="http://sailsjs.org/images/sails-logo.jpg")
+
+  ul.nav.navbar-nav#tag-list
+
+  #audio-box
+  ul#audio-list
+
+  #video-box
+  ul#video-list
+
+  .table-swipe
+    table.table
+      tbody
+        tr
+          td#image-list
+
+  .row
+    .col-md-4
       h4#new New to Sails?
       ul
         li
@@ -62,3 +69,47 @@ block body
           a(target="_blank", href="http://sailsjs.org") Build a realtime app
         li.sprite.api
           a(target="_blank", href="http://sailsjs.org") Build an API
+    .col-md-8
+      h1#main-title Welcome
+        h2 Getting started
+        p Don't worry, we've got your back.
+
+          ul.getting-started
+            li
+              .sprite.one
+              div
+                h3 Get your API going.
+                p
+                  | Run
+                  code sails generate foo
+                  | .  This will create a model
+                  code Foo
+                  |  and controller
+                  code FooController
+            li
+              .sprite.two
+              div
+                h3 Lift your app.
+                p
+                  | Run
+                  code sails lift
+                  |  to start up your app.  If you visit
+                  code http://localhost:1337/foo
+                  |  in your browser, you'll see a socket.io-compatible REST API was generated for your 'Foo' model.
+            li
+              .sprite.three
+              div
+                h3 Dive in and start building.
+                p From here, you can modify your models, create custom controller methods as Express middleware, and create custom routes (routes are set up in
+                  code config/routes.js
+                  | ).  Visit
+                  a(href="http://sailsjs.org") the Sails website
+                  |  for more information on next steps.
+
+        .delete
+          .sprite You're looking at:
+            code views/home/index.jade
+
+  footer
+
+

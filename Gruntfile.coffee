@@ -390,6 +390,7 @@ module.exports = (grunt) ->
 
   # When Sails is lifted:
   grunt.registerTask "default", [
+    "bower"
     "compileAssets"
     "linkAssets"
     "watch"
