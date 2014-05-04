@@ -14,16 +14,16 @@ parse =
     ext = href.split(".").pop()
     switch ext.toLowerCase()
       when "jpg", "png"
-        "image"
+        "Image"
       when "mp4", "m4v", "mov", "wmv"
-        "video"
+        "Video"
       when "mp3", "3gp", "aac", "wav", "wma"
-        "audio"
+        "Audio"
       else
         if href.match /// /$ ///
-          "dir"
+          "Dir"
         else
-          "file"
+          "File"
 
   size: (str)->
     [_, num, si] = str.match /// ([0-9,.]+)([^ ]?) ///
@@ -61,17 +61,43 @@ parse =
   ], (str)-> new RegExp str, "gi"
 
 
+class Tag extends String
+
+class Dir extends String
+
+class File
+
+class Image
+
+class Video
+
+class Audio
+
 groups =
-  tag: {}
-  dir: []
-  file: []
-  image: []
-  video: []
-  audio: []
+  Tag: {}
+  Dir: []
+  File: []
+  Image: []
+  Video: []
+  Audio: []
+
+prototypes =
+  Tag: Tag.prototype
+  Dir: Dir.prototype
+  File: File.prototype
+  Image: Image.prototype
+  Video: Video.prototype
+  Audio: Audio.prototype
+
+
+add_item = (href, hash)->
+  ext = parse.ext href
+  hash.__proto__ = prototypes[ext]
+  groups[ext].push hash
 
 show_tags = ->
   area = d3.select("#tag-list")
-  list = area.selectAll("li").data _.sortBy Object.keys groups.tag
+  list = area.selectAll("li").data _.sortBy Object.keys groups.Tag
   list.enter().append("li")
   list.exit().remove()
   list.attr
@@ -88,7 +114,7 @@ get_dir = (url, cb)->
       tags = {}
       for dirname in pathname.split(/// [/ ] ///)
         parse.cut_tags dirname, tags
-      groups[parse.ext href].push
+      add_item href,
         filename:  filename
         size_text: size
         href: href
@@ -97,26 +123,26 @@ get_dir = (url, cb)->
         label: parse.cut_tags filename, tags
         tags: _.sortBy Object.keys tags
       for tag, __ of tags
-        groups.tag[tag] = true
+        groups.Tag[tag] = true
     cb groups if cb
 
 get_dir "/lib/testdata-m4v.html", (data)->
   area = d3.select("#video-list")
   refresh = (box)->
-    list = area.selectAll("li").data(box)
+    list = area.selectAll("li").data box, (d)-> d.href
     list.enter().append("li")
     list.exit().remove()
     list.text (d)->
       d.label
 
-  data.video = _.sortBy data.video, (o)-> o.label
-  refresh data.video
+  data.Video = _.sortBy data.Video, (o)-> o.label
+  refresh data.Video
   show_tags()
 
 get_dir "/lib/testdata-cinema.html", (data)->
   area = d3.select("#video-list")
   refresh = (box)->
-    list = area.selectAll("li").data(box)
+    list = area.selectAll("li").data box, (d)-> d.href
     list.enter().append("li")
     list.exit().remove()
     list.text (d)->
@@ -124,50 +150,35 @@ get_dir "/lib/testdata-cinema.html", (data)->
     list.on "click", (d)->
       location.href = "http://utage.family.jp/media/iPad/Videos/%5B%E6%98%A0%E7%94%BB%5D%20BD-src/" + d.href
 
-  data.video = _.sortBy data.video, (o)-> o.label
-  refresh data.video
+  data.Video = _.sortBy data.Video, (o)-> o.label
+  refresh data.Video
   show_tags()
 
+
 get_dir "/lib/testdata-mp3.html", (data)->
+  playlist = new AudioPlayer "#audio-box"
+  playlist.src = (d)-> "http://utage.family.jp/media/Audio/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2_%EF%BD%94%EF%BD%8D%EF%BD%90/" + d.href
+
   area = d3.select("#audio-list")
+
   refresh = (box)->
-    list = area.selectAll("li").data(box)
+    list = area.selectAll("li").data box, (d)-> d.href
     list.enter().append("li")
     list.exit().remove()
     list.text (d)->
       d.label
     list.on "click", (d)->
-      list = d3.select("#audio-box").selectAll("audio").data([d])
-      list.enter().append("audio")
-      list.exit().remove()
-      list.attr
-        src: "http://utage.family.jp/media/Audio/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2_%EF%BD%94%EF%BD%8D%EF%BD%90/" + d.href
-        controls: "on"
-        preload: "auto"
-        autoplay: ""
+      playlist.push(d)
 
-  data.audio = _.sortBy data.audio, (o)-> o.label
-  refresh data.audio
+  data.Audio = _.sortBy data.Audio, (o)-> o.label
+  refresh data.Audio
   show_tags()
 
 get_dir "/lib/testdata-jpg.html", (data)->
-  box = []
-  area = d3.select("#image-list")
-  refresh = (box)->
-    box.unshift data.image.shift()
+  images = new ImageViewer "#image-list"
+  images.src = (d)-> "http://utage.family.jp/media/PDFbare/2013-01/%5BCLAMP%5D%20CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3/CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3-01/" + d.href
 
-    list = area.selectAll("img").data(box)
-    list.enter().append('img')
-    list.exit().remove()
-    list.attr
-      src: (d)-> "http://utage.family.jp/media/PDFbare/2013-01/%5BCLAMP%5D%20CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3/CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3-01/" + d.href
-      height: -> window.innerHeight
-    list.on "click", ->
-      refresh box
-    if window.innerWidth < _.reduce list[0], ((sum,data)-> sum + data.width), 0
-      box.pop()
-
-  data.image = _.sortBy data.image, (o)-> o.label
-  refresh box
+  data.Image = _.sortBy data.Image, (o)-> o.label
+  images.start data.Image
   show_tags()
 
