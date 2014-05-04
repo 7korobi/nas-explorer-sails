@@ -95,15 +95,8 @@ add_item = (href, hash)->
   hash.__proto__ = prototypes[ext]
   groups[ext].push hash
 
-show_tags = ->
-  area = d3.select("#tag-list")
-  list = area.selectAll("li").data _.sortBy Object.keys groups.Tag
-  list.enter().append("li")
-  list.exit().remove()
-  list.attr
-    class: "btn btn-default"
-  list.text (d)-> d
 
+tag_list = new TagList "#tag-list"
 get_dir = (url, cb)->
   d3.text url, (err, text)->
     return console.warn error if err
@@ -125,6 +118,8 @@ get_dir = (url, cb)->
       for tag, __ of tags
         groups.Tag[tag] = true
     cb groups if cb
+    tag_list.all Object.keys groups.Tag
+
 
 get_dir "/lib/testdata-m4v.html", (data)->
   area = d3.select("#video-list")
@@ -137,7 +132,6 @@ get_dir "/lib/testdata-m4v.html", (data)->
 
   data.Video = _.sortBy data.Video, (o)-> o.label
   refresh data.Video
-  show_tags()
 
 get_dir "/lib/testdata-cinema.html", (data)->
   area = d3.select("#video-list")
@@ -152,7 +146,6 @@ get_dir "/lib/testdata-cinema.html", (data)->
 
   data.Video = _.sortBy data.Video, (o)-> o.label
   refresh data.Video
-  show_tags()
 
 
 get_dir "/lib/testdata-mp3.html", (data)->
@@ -172,7 +165,6 @@ get_dir "/lib/testdata-mp3.html", (data)->
 
   data.Audio = _.sortBy data.Audio, (o)-> o.label
   refresh data.Audio
-  show_tags()
 
 get_dir "/lib/testdata-jpg.html", (data)->
   images = new ImageViewer "#image-list"
@@ -180,5 +172,4 @@ get_dir "/lib/testdata-jpg.html", (data)->
 
   data.Image = _.sortBy data.Image, (o)-> o.label
   images.start data.Image
-  show_tags()
 
