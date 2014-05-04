@@ -152,8 +152,7 @@ get_dir "/lib/testdata-mp3.html", (data)->
 
 get_dir "/lib/testdata-jpg.html", (data)->
   box = []
-  area = d3.select("#image-list").attr
-    style: "height: #{window.innerHeight}px; width: #{window.innerWidth}px; white-space: nowrap;"
+  area = d3.select("#image-list")
   refresh = (box)->
     box.unshift data.image.shift()
 

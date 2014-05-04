@@ -9,14 +9,14 @@ html(ng-app)
     )
     // STYLES
     link(rel="stylesheet", href="/lib/bootstrap.css")
+    link(rel="stylesheet", href="/linker/styles/table.css")
     // STYLES END
 
   body
-    .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
-      .container
-        block navbar
     .container.theme-showcase(role="main")
       block body
+
+    block bottom
 
     // SCRIPTS
     script(type="text/javascript", src="/lib/jquery.js")
