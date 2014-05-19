@@ -3,7 +3,7 @@ parse =
   timestamp: d3.time.format("%d-%b-%Y %H:%M").parse
 
   line: new RegExp """
-      <a href="([^>]+)">([^>]+)</a> +([0-9a-zA-Z-]+) +([0-9:]+) +([0-9A-Z.]+)
+      <a href="([^>]+)">([^>]+)</a> +([0-9a-zA-Z-]+) +([0-9:]+) +(-|[0-9A-Z.]+)
     """, "gi"
 
   path: new RegExp """
@@ -13,7 +13,9 @@ parse =
   ext: (href)->
     ext = href.split(".").pop()
     switch ext.toLowerCase()
-      when "jpg", "png"
+      when "swf"
+        "Flash"
+      when "jpg", "png", "gif"
         "Image"
       when "mp4", "m4v", "mov", "wmv"
         "Video"
@@ -26,7 +28,9 @@ parse =
           "File"
 
   size: (str)->
-    [_, num, si] = str.match /// ([0-9,.]+)([^ ]?) ///
+    matches = str.match /// ([0-9,.]+)([^ ]?) ///
+    return 0 unless matches
+    [_, num, si] = matches
     si_size =
       switch si
         when "T"
@@ -47,10 +51,10 @@ parse =
         for tag in str.split(/・/gi)
           tags[tag] = true
         ""
-    str
+    str.replace("/","")
 
   tags_regexp: _.map [
-    '\\.([^.]+)$'
+    '\\.([^./]+)$'
     '（(.+)）'
     '\\[([^\\[\\]]+)\\]'
     '\\(([^\\(\\)]+)\\)'
@@ -73,13 +77,37 @@ class Video
 
 class Audio
 
+class Flash
+
+class EventBox
+  constructor: (hash)->
+    @lists = []
+    for key, list of hash
+      @lists.push list
+
+  clean: ->
+    for d3box in @lists
+      d3box.clean() if d3box.clean
+
+  sort: ->
+    for d3box in @lists
+      d3box.sort() if d3box.sort
+
+
+  update: ->
+    for d3box in @lists
+      d3box.update() if d3box.update
+
 groups =
-  Tag: {}
-  Dir: []
+  Tag: new TagList "#tag-list"
+  Dir: new DirTree "#dir-list", "http://utage.family.jp/media/"
   File: []
-  Image: []
-  Video: []
-  Audio: []
+  Flash: new FlashList "#flash-list", "#flash-viewer"
+  Image: new ImageViewer "#image-list"
+  Video: new VideoList "#video-list"
+  Audio: new AudioList "#audio-list", "#audio-box"
+
+event_box = new EventBox groups
 
 prototypes =
   Tag: Tag.prototype
@@ -96,80 +124,36 @@ add_item = (href, hash)->
   groups[ext].push hash
 
 
-tag_list = new TagList "#tag-list"
+tag_list =
+
 get_dir = (url, cb)->
   d3.text url, (err, text)->
-    return console.warn error if err
+    return console.warn err if err
+
+    event_box.clean()
 
     [__, pathname] = text.match parse.path
 
     text.replace parse.line, (__, href, filename, day, time, size)->
+      href = href.replace(/&amp;/g, "&")
       tags = {}
       for dirname in pathname.split(/// [/ ] ///)
         parse.cut_tags dirname, tags
       add_item href,
         filename:  filename
         size_text: size
-        href: href
+        href: url + href
+        href_base: url
         size: parse.size size
         timestamp: parse.timestamp "#{day} #{time}"
         label: parse.cut_tags filename, tags
         tags: _.sortBy Object.keys tags
       for tag, __ of tags
-        groups.Tag[tag] = true
+        groups.Tag.push tag
+    event_box.sort()
     cb groups if cb
-    tag_list.all Object.keys groups.Tag
+    event_box.update()
 
 
-get_dir "/lib/testdata-m4v.html", (data)->
-  area = d3.select("#video-list")
-  refresh = (box)->
-    list = area.selectAll("li").data box, (d)-> d.href
-    list.enter().append("li")
-    list.exit().remove()
-    list.text (d)->
-      d.label
-
-  data.Video = _.sortBy data.Video, (o)-> o.label
-  refresh data.Video
-
-get_dir "/lib/testdata-cinema.html", (data)->
-  area = d3.select("#video-list")
-  refresh = (box)->
-    list = area.selectAll("li").data box, (d)-> d.href
-    list.enter().append("li")
-    list.exit().remove()
-    list.text (d)->
-      d.label
-    list.on "click", (d)->
-      location.href = "http://utage.family.jp/media/iPad/Videos/%5B%E6%98%A0%E7%94%BB%5D%20BD-src/" + d.href
-
-  data.Video = _.sortBy data.Video, (o)-> o.label
-  refresh data.Video
-
-
-get_dir "/lib/testdata-mp3.html", (data)->
-  playlist = new AudioPlayer "#audio-box"
-  playlist.src = (d)-> "http://utage.family.jp/media/Audio/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2/%E8%B5%B0%E3%82%8C%E6%AD%8C%E8%AC%A1%E6%9B%B2_%EF%BD%94%EF%BD%8D%EF%BD%90/" + d.href
-
-  area = d3.select("#audio-list")
-
-  refresh = (box)->
-    list = area.selectAll("li").data box, (d)-> d.href
-    list.enter().append("li")
-    list.exit().remove()
-    list.text (d)->
-      d.label
-    list.on "click", (d)->
-      playlist.push(d)
-
-  data.Audio = _.sortBy data.Audio, (o)-> o.label
-  refresh data.Audio
-
-get_dir "/lib/testdata-jpg.html", (data)->
-  images = new ImageViewer "#image-list"
-  images.src = (d)-> "http://utage.family.jp/media/PDFbare/2013-01/%5BCLAMP%5D%20CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3/CLAMP%E5%AD%A6%E5%9C%92%E6%8E%A2%E5%81%B5%E5%9B%A3-01/" + d.href
-
-  data.Image = _.sortBy data.Image, (o)-> o.label
-  images.start data.Image
+get_dir "http://utage.family.jp/media/", (data)->
 

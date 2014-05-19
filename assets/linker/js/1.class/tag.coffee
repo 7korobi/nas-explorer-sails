@@ -3,6 +3,13 @@ class TagList extends D3Box
     super
     @elem = "li"
     @data = []
+    @switch = {}
+
+  push: (item)->
+    @switch[item] = true
+
+  sort: ->
+    @data = Object.keys @switch
 
   update: ->
     @list = @area.selectAll(@elem).data @data
@@ -14,5 +21,3 @@ class TagList extends D3Box
 
     @list.on "click", (d, idx)->
 
-  all: (@data)->
-    @update() if @data

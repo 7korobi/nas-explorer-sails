@@ -3,12 +3,24 @@ class ImageViewer extends D3Box
     super
     @elem = "img"
 
+  push: (item)->
+    @all.push item
+
+  clean: ->
+    @index = 0
+    @data = []
+    @all = []
+
+  sort: ->
+    @succ() if @data.length == 0 && @all.length > 0
+    @all = _.sortBy @all, (o)-> o.href
+
   update: ->
     @list = @area.selectAll(@elem).data @data
     @list.enter().append @elem
     @list.exit().remove()
     @list.attr
-      src: @src
+      src: (d)-> d.href
       height: -> window.innerHeight
 
     @list.on "click", (d, idx)=>
@@ -33,9 +45,6 @@ class ImageViewer extends D3Box
         @index--
         @data.shift()
 
-  start: (@all)->
-    @index = 0
-    @data = []
     @succ()
 
   reduce: (cb)->
